@@ -60,9 +60,6 @@ class traced extends cask.RawDecorator {
           case e: Error =>
             span.setStatus(StatusCode.ERROR)
             e
-          case p: ParamError =>
-            span.setStatus(StatusCode.ERROR)
-            p
       finally
         span.end()
     }.get

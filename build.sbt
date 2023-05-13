@@ -29,6 +29,8 @@ lazy val root = project
       // Web server framework
       "com.lihaoyi" %% "cask" % "0.9.1",
       // Client Library
-      "com.lihaoyi" %% "requests" % "0.8.0"
+      "com.lihaoyi" %% "requests" % "0.8.0",
+      // Serialization
+      "com.lihaoyi" %% "upickle" % "3.1.0"
     )
   )
