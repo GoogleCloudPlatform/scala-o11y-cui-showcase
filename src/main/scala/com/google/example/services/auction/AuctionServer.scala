@@ -5,11 +5,15 @@ import upickle.default.writeJs
 
 /** Microservice for posting and clearing auctions for items. */
 object AuctionServer  extends cask.MainRoutes:
+  println("Initializing Auction Server.")
   com.google.example.o11y.initializeOpenTelemetry()
   initialize()
 
   // TODO - Move this to a database.
   private val dataStore: AuctionDataStore = new LocalAuctionDataStore()
+
+  override def port: Int = 8080
+  override def host: String = "0.0.0.0"
 
   @traced
   @cask.get("/auctions")

@@ -120,11 +120,9 @@ class CaskToSlf4jLogger extends cask.util.Logger:
 
 /** Helper method to initialize open telemetry for OTLP export. */
 def initializeOpenTelemetry(): Unit =
-  // TODO - Verify this is all correct.
+  println("Starting OpenTelemetry!")
   AutoConfiguredOpenTelemetrySdk.builder()
-    .addPropertiesSupplier(() =>
-      java.util.Map.of("otel.logs.exporter", "otlp",
-      "otel.exporter.otlp.endpoint", "http://localhost:4317"))
+    .addPropertiesSupplier(() => java.util.Map.of("otel.logs.exporter", "otlp"))
     .addLoggerProviderCustomizer((provider, config) => provider.addLogRecordProcessor(CuiLogRecordProcessor))
     .addTracerProviderCustomizer((provider, config) => provider.addSpanProcessor(CuiSpanProcessor))
     .setResultAsGlobal(true)

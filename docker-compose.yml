@@ -7,3 +7,12 @@ services:
     command: ["--config=/otel-config.yaml"]
     ports:
       - "4317:4317"
+  auction_server:
+    image: scala-playground:0.1.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    depends_on:
+      - collector
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=auction_server"

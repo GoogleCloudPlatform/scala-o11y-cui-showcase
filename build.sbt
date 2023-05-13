@@ -3,15 +3,13 @@ val otelVersion = "1.26.0"
 val slf4jVersion = "2.0.6"
 val logbackVersion = "1.4.6"
 
-
 lazy val root = project
   .in(file("."))
+  .enablePlugins(JavaServerAppPackaging)
   .settings(
     name := "scala-playground",
     version := "0.1.0-SNAPSHOT",
-
     scalaVersion := scala3Version,
-
     libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test,
     libraryDependencies ++= Seq(
       // OTEL Dependencies
@@ -32,5 +30,7 @@ lazy val root = project
       "com.lihaoyi" %% "requests" % "0.8.0",
       // Serialization
       "com.lihaoyi" %% "upickle" % "3.1.0"
-    )
+    ),
+    dockerBaseImage := "openjdk:21-slim",
+    dockerExposedPorts += 8080
   )

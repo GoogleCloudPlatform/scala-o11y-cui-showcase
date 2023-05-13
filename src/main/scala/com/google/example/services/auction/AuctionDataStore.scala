@@ -16,6 +16,7 @@ trait AuctionDataStore:
 
 /** Lame, synchronous in-memory implementation. */
 class LocalAuctionDataStore extends AuctionDataStore:
+  println("Starting in-memory auction datastore.")
   private var nextId = 1L
   private var auctions = List[Auction](Auction(5000, "seed item", "Josh", 0, Seq()))
 
