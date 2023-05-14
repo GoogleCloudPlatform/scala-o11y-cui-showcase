@@ -16,3 +16,13 @@ services:
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
       OTEL_RESOURCE_ATTRIBUTES: "service.name=auction_server"
+  gateway:
+    image: scala-o11y-showcase:0.1.0-SNAPSHOT
+    ports:
+      - "8081:8081"
+    depends_on:
+      - collector
+    environment:
+      AUCTION_SERVER: http://auction_server:8080
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=gateway"

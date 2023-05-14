@@ -19,22 +19,12 @@ lazy val utils =
 lazy val auctionServer =
   project
     .in(file("auctionServer"))
-    .enablePlugins(JavaServerAppPackaging, ScalaConventions)
-    .settings(
-      dockerBaseImage := "openjdk:21-slim",
-      dockerExposedPorts += 8080,
-      libraryDependencies ++= Seq(
-        Dependencies.otel.exporterOtlp,
-        Dependencies.otel.exporterOtlpLogs,
-        Dependencies.logback.core,
-        Dependencies.logback.classic
-      )
-    )
+    .enablePlugins(DockerConventions)
     .dependsOn(utils)
 
 lazy val root = project
   .in(file("."))
-  .enablePlugins(ScalaConventions)
+  .enablePlugins(DockerConventions)
   .dependsOn(utils)
   .aggregate(utils, auctionServer)
   .settings(

@@ -32,8 +32,19 @@ def propagatedHeaders(): Iterable[(String, String)] =
   GlobalOpenTelemetry.getPropagators.getTextMapPropagator.inject(Context.current(), result, (c, k, v) => c.put(k,v))
   result
 
+/** Cask wrapper that adds CUI to baggage for remaining processing */
+class cui(val id: String) extends cask.RawDecorator:
+  def wrapFunction(ctx: cask.Request, delegate: Delegate) =
+    // Insert this CUI into baggage.
+    val scope = Baggage.fromContext(Context.current()).toBuilder
+      .put("cui", id)
+      .build().makeCurrent()
+    try delegate(Map())
+    finally scope.close()
+
+
 /** Cask wrapper that does context propagation and tracing */
-class traced extends cask.RawDecorator {
+class traced extends cask.RawDecorator:
   val tracer = GlobalOpenTelemetry.getTracer("cask")
   def wrapFunction(ctx: cask.Request, delegate: Delegate) =
     Using.Manager { use =>
@@ -69,7 +80,7 @@ class traced extends cask.RawDecorator {
 
   private def spanName(ctx: cask.Request): String =
     s"${ctx.exchange.getRequestMethod.toString} ${ctx.exchange.getRequestURI}"
-}
+
 
 object CuiKeys:
   val cuiKey = AttributeKey.stringKey("cui")

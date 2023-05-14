@@ -1,30 +1,24 @@
 
-import com.google.example.o11y.{traced, CaskToSlf4jLogger, propagatedHeaders}
+import com.google.example.o11y.{traced, cui, CaskToSlf4jLogger, propagatedHeaders}
 
+// This is our "outer gateway" to the microservices.
 object MyApplication extends cask.MainRoutes:
   com.google.example.o11y.initializeOpenTelemetry()
   initialize()
 
   override val log = CaskToSlf4jLogger()
+  private val AuctionServerUrl = sys.env.getOrElse("AUCTION_SERVER", "http://localhost:8080")
+  override def port: Int = 8081
+  override def host: String = "0.0.0.0"
 
+  @cui("search")
   @traced
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
-    s"Hello, World!\n${io.opentelemetry.api.trace.Span.current()}\n"
 
-  @traced
-  @cask.get("/error")
-  def bad() =
-    throw new RuntimeException("O NOES")
+    // TODO  - create client span
+    requests.get(s"${AuctionServerUrl}/auctions", headers=propagatedHeaders()).data.array
 
-  @traced
-  @cask.get("/redirected")
-  def downstream() =
-    // TODO - We need to wrap requests so we can create client-side spans.
-    requests.get("http://localhost:8080/", headers=propagatedHeaders()).data.array
-
-
-// TODO - test w/ OTEL_EXPORTER_OTLP_ENDPOINT or otel.exporter.otlp.endpoint
 
 
