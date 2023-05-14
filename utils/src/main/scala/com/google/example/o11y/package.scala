@@ -1,15 +1,14 @@
 package com.google.example.o11y
 
-import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.baggage.Baggage
-import io.opentelemetry.api.GlobalOpenTelemetry
-import io.opentelemetry.api.OpenTelemetry
+import io.opentelemetry.api.common.AttributeKey
 import io.opentelemetry.api.trace.{Span, SpanKind, StatusCode}
+import io.opentelemetry.api.{GlobalOpenTelemetry, OpenTelemetry}
 import io.opentelemetry.context.Context
 import io.opentelemetry.context.propagation.{TextMapGetter, TextMapSetter}
-import io.opentelemetry.sdk.trace.{ReadWriteSpan, ReadableSpan, SpanProcessor}
-import io.opentelemetry.sdk.logs.{LogRecordProcessor, ReadWriteLogRecord}
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
+import io.opentelemetry.sdk.logs.{LogRecordProcessor, ReadWriteLogRecord}
+import io.opentelemetry.sdk.trace.{ReadWriteSpan, ReadableSpan, SpanProcessor}
 import org.slf4j.bridge.SLF4JBridgeHandler
 
 import scala.collection.mutable
@@ -51,7 +50,7 @@ class traced extends cask.RawDecorator {
       val span: Span = spanBuilder.startSpan()
       use(span.makeCurrent())
       try
-        import cask.router.Result._
+        import cask.router.Result.*
         delegate(Map()) match
           case s: Success[cask.Response.Raw] =>
             span.setAttribute(HttpSemconv.httpStatusCode, s.value.statusCode)

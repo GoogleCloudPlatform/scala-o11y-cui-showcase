@@ -1,5 +1,6 @@
 package com.google.example.services.auction
 
+
 import com.google.example.o11y.{traced, CaskToSlf4jLogger, propagatedHeaders}
 import upickle.default.writeJs
 

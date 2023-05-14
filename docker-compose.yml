@@ -8,7 +8,7 @@ services:
     ports:
       - "4317:4317"
   auction_server:
-    image: scala-playground:0.1.0-SNAPSHOT
+    image: auctionserver:0.1.0-SNAPSHOT
     ports:
       - "8080:8080"
     depends_on:
