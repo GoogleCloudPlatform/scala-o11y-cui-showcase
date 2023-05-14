@@ -1,8 +1,16 @@
-## Scala observability sample
+# Scala observability sample
 
+A highlight of the Li Haoyi Scala 3 ecosystem as "enhanced" by opentelemetry-java.
 
+This project attempts to:
 
-## Testing
+- Demonstrate the value of CUI annotations (tbd link)
+- Demonstrate how to "instrument" Li Haoyi's ecosystem of Scala 3 libraries
+  - In some cases, there is an elegant solution
+  - In many cases, there is no affordance for our use case
+- Demonstrate (via docker-compose) how to run all these microservices together with ONE observability funnel 
+
+## How to run locallly
 
 First push local docker images
 ```
@@ -16,14 +24,14 @@ docker-compose up
 ```
 
 
-Pinging the service
+Pinging the service with your own trace/baggage
 ```bash
-curl http://localhost:8080/auctions -H "traceparent:  00-ff000000000000000000000000000041-ff00000000000041-01" -H "baggage: cui=test-use-case2"
+curl http://localhost:8081/ \
+  -H "traceparent:  00-ff000000000000000000000000000041-ff00000000000041-01" \
+  -H "baggage: cui=test-use-case2"
 ```
 
-
-
-### Pinging the auction service
+### Pinging the auction service directly
 
 Posting an item
 ```bash

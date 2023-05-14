@@ -32,55 +32,6 @@ def propagatedHeaders(): Iterable[(String, String)] =
   GlobalOpenTelemetry.getPropagators.getTextMapPropagator.inject(Context.current(), result, (c, k, v) => c.put(k,v))
   result
 
-/** Cask wrapper that adds CUI to baggage for remaining processing */
-class cui(val id: String) extends cask.RawDecorator:
-  def wrapFunction(ctx: cask.Request, delegate: Delegate) =
-    // Insert this CUI into baggage.
-    val scope = Baggage.fromContext(Context.current()).toBuilder
-      .put("cui", id)
-      .build().makeCurrent()
-    try delegate(Map())
-    finally scope.close()
-
-
-/** Cask wrapper that does context propagation and tracing */
-class traced extends cask.RawDecorator:
-  val tracer = GlobalOpenTelemetry.getTracer("cask")
-  def wrapFunction(ctx: cask.Request, delegate: Delegate) =
-    Using.Manager { use =>
-      use(GlobalOpenTelemetry.getPropagators.getTextMapPropagator.extract(Context.current(), ctx, CaskTextMapGetter).makeCurrent())
-      val spanBuilder =
-        tracer.spanBuilder(spanName(ctx))
-          .setSpanKind(SpanKind.SERVER)
-          .setAttribute(HttpSemconv.clientAddress, ctx.exchange.getConnection.getPeerAddress.toString)
-          .setAttribute(HttpSemconv.serverAddress, ctx.exchange.getHostName)
-          .setAttribute(HttpSemconv.serverPort, ctx.exchange.getHostPort.toLong)
-          .setAttribute(HttpSemconv.urlPath, ctx.exchange.getRequestPath)
-          .setAttribute(HttpSemconv.urlQuery, ctx.exchange.getQueryString)
-          .setAttribute(HttpSemconv.urlScheme, ctx.exchange.getRequestScheme)
-      val span: Span = spanBuilder.startSpan()
-      use(span.makeCurrent())
-      try
-        import cask.router.Result.*
-        delegate(Map()) match
-          case s: Success[cask.Response.Raw] =>
-            span.setAttribute(HttpSemconv.httpStatusCode, s.value.statusCode)
-            span.setStatus(StatusCode.OK)
-            s
-          case e: Error =>
-            span.setStatus(StatusCode.ERROR)
-            e match
-              case Error.Exception(e) => span.recordException(e)
-              case _ => // Ignore
-            e
-      finally
-        span.end()
-    }.get
-
-
-  private def spanName(ctx: cask.Request): String =
-    s"${ctx.exchange.getRequestMethod.toString} ${ctx.exchange.getRequestURI}"
-
 
 object CuiKeys:
   val cuiKey = AttributeKey.stringKey("cui")
@@ -101,32 +52,6 @@ object CuiSpanProcessor extends SpanProcessor:
     Baggage.fromContext(parentContext).getEntryValue(CuiKeys.cuiKey.getKey) match
       case null =>
       case value => span.setAttribute(CuiKeys.cuiKey, value)
-
-
-/** Interaction between CASK and OTEL propagation. */
-object CaskTextMapGetter extends TextMapGetter[cask.Request]:
-  override def keys(r: cask.Request): java.lang.Iterable[String] = r.headers.keys.asJava
-  override def get(r: cask.Request, key: String): String =
-    val optResult = for
-      values <- r.headers.get(key)
-      head <- values.headOption
-    yield head
-    optResult.orNull
-
-class CaskToSlf4jLogger extends cask.util.Logger:
-  import sourcecode.{File, Line, Text}
-  private val logger = org.slf4j.LoggerFactory.getLogger("cask")
-  override def debug(t: Text[Any])(implicit f: File, line: Line): Unit =
-    logger.atDebug()
-      .addKeyValue("source.line", line.value.toString)
-      .addKeyValue("source.file", f.value.split("/").last)
-      .addKeyValue("source.expression", t.source)
-      .log(pprint.apply(t.value).plainText)
-  override def exception(t: Throwable): Unit =
-    logger.atError()
-    .setCause(t)
-    .log()
-
 
 /** Helper method to initialize open telemetry for OTLP export. */
 def initializeOpenTelemetry(): Unit =
