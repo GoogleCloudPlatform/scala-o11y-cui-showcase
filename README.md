@@ -7,7 +7,7 @@ This project attempts to:
 - Demonstrate the value of CUI annotations (tbd link)
 - Demonstrate how to "instrument" Li Haoyi's ecosystem of Scala 3 libraries
   - In some cases, there is an elegant solution
-  - In many cases, there is no affordance for our use case
+  - In many cases, there is no affordance for our use case, so we duplicate the API.
 - Demonstrate (via docker-compose) how to run all these microservices together with ONE observability funnel 
 
 ## How to run locallly
