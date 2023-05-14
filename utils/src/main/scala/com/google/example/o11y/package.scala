@@ -26,13 +26,6 @@ object HttpSemconv:
   val urlScheme = AttributeKey.stringKey("url.scheme")
   val httpStatusCode = AttributeKey.longKey("http.response.status_code")
 
-// For use w/ requests library
-def propagatedHeaders(): Iterable[(String, String)] =
-  val result = collection.mutable.Map[String, String]()
-  GlobalOpenTelemetry.getPropagators.getTextMapPropagator.inject(Context.current(), result, (c, k, v) => c.put(k,v))
-  result
-
-
 object CuiKeys:
   val cuiKey = AttributeKey.stringKey("cui")
 
