@@ -1,0 +1,71 @@
+# Copyright 2023 Google
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: gcp-exporter-service
+spec:
+  image: otel/opentelemetry-collector-contrib:0.77.0
+  mode: deployment
+  serviceAccount: telemetry-agent
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+    exporters:
+        logging:
+        #   verbosity: detailed
+        googlemanagedprometheus:
+        googlecloud:
+          log:
+            default_log_name: opentelemetry.io/collector-exported-log
+            resource_filters:
+            - regex: .*
+    processors:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 65
+        spike_limit_percentage: 20
+      batch:
+      resourcedetection:
+        detectors: [env, gcp]
+        timeout: 2s
+        override: false
+      # Helper to set log names to instrumentation-scope
+      transform:
+        error_mode: ignore
+        log_statements:
+          - context: log
+            statements:
+            - set(attributes["gcp.log_name"], instrumentation_scope.name) where attributes["gcp.log_name"] == nil
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [resourcedetection, memory_limiter, batch]
+          exporters: [googlecloud, logging]
+          # exporters: [logging]
+        metrics:
+          receivers: [otlp]
+          processors: [resourcedetection, memory_limiter, batch]
+          exporters: [googlemanagedprometheus, logging]
+          # exporters: [logging]
+        logs:
+          receivers: [otlp]
+          processors: [transform, resourcedetection, memory_limiter, batch]
+          exporters: [googlecloud, logging]
+          # exporters: [logging]

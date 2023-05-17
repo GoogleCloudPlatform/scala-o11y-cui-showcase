@@ -59,3 +59,33 @@ Listing a specific Auction
 AUCTION_ID=5000
 curl http://localhost:8080/auctions/${AUCTION_ID}
 ```
+
+
+# Deploy to GKE-autopilot
+
+TODO - instructions for configuring OTEL operator http://github.com/GoogleCloudPlatform/otel-operator-sample
+
+## Configuring Artifact Registry
+
+TODO - link to documents on how to enable permissions and set up a docker registry
+TODO - Descript how to update `common_veriables.sh`
+
+Push docker images to artifact registry
+```bash
+sbt Docker/publishLocal && ./push_docker_images.sh
+```
+
+
+Then to try things out:
+
+```bash
+kubectl run mycurlpod --image=curlimages/curl -i --tty -- sh
+```
+
+```bash
+kubectl attach mycurlpod -c mycurlpod -i -t
+```
+
+```bash
+curl  http://frontend-service.default.svc.cluster.local
+```
