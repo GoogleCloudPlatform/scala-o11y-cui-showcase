@@ -18,12 +18,14 @@ package com.google.example.services.auction
 
 import com.google.example.o11y.cask._
 import upickle.default.writeJs
+import io.opentelemetry.api.common.Attributes
 
 /** Microservice for posting and clearing auctions for items. */
 object AuctionServer  extends OtelMainRoutes:
   initialize()
   // TODO - Move this to a database.
   private val dataStore: AuctionDataStore = new LocalAuctionDataStore()
+  private val eventLogger = io.opentelemetry.api.events.GlobalEventEmitterProvider.get().get("AuctionServer")
 
   override def port: Int = 8080
   override def host: String = "0.0.0.0"
@@ -31,7 +33,13 @@ object AuctionServer  extends OtelMainRoutes:
   @traced
   @cask.get("/auctions")
   def list() =
-    writeJs(dataStore.list())
+    val result = dataStore.list()
+    eventLogger.emit(
+      "auction.views",
+      Attributes.builder()
+        .put("items.returned", result.length)
+      .build())
+    writeJs(result)
 
   @traced
   @cask.get("/auctions/:id")
