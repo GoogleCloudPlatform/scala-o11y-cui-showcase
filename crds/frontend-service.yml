@@ -41,6 +41,7 @@ spec:
       containers:
         - name: frontend-service
           image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/scala-o11y-showcase:0.1.0-SNAPSHOT
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

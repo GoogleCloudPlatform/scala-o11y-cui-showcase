@@ -41,6 +41,7 @@ spec:
       containers:
         - name: auction-service
           image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/auctionserver:0.1.0-SNAPSHOT
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
