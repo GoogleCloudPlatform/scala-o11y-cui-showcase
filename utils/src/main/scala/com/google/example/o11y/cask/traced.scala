@@ -51,6 +51,7 @@ class traced extends RawDecorator:
             span.setStatus(StatusCode.OK)
             s
           case e: Error =>
+            span.setAttribute(HttpSemconv.httpStatusCode, 500)
             span.setStatus(StatusCode.ERROR)
             e match
               case Error.Exception(e) => span.recordException(e)

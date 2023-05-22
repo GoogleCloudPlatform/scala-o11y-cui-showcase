@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.{dockerBaseImage, dockerExposedPorts}
+import com.typesafe.sbt.packager.Keys.packageName
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.{Docker, dockerBaseImage, dockerExposedPorts}
 import com.typesafe.sbt.packager.archetypes.JavaServerAppPackaging
 import sbt.Keys._
 import sbt.{Def, _}
 
 object DockerConventions extends AutoPlugin {
   override def requires = ScalaConventions && JavaServerAppPackaging
+
+  val dockerLocalTagName = Def.taskKey[String]("Local docker tag name")
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     dockerBaseImage := "openjdk:21-slim",
@@ -30,6 +33,11 @@ object DockerConventions extends AutoPlugin {
       Dependencies.otel.exporterOtlpLogs,
       Dependencies.logback.core,
       Dependencies.logback.classic
-    )
+    ),
+    dockerLocalTagName := {
+      val name = (Docker / packageName).value
+      val version = (Docker / Keys.version).value
+      s"${name}:${version}"
+    }
   )
 }
