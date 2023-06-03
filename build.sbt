@@ -32,3 +32,5 @@ lazy val root = project
   .settings(
     name := "scala-o11y-showcase"
   )
+
+ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
