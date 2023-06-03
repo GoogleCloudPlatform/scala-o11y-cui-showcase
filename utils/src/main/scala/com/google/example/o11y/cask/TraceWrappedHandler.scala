@@ -51,8 +51,8 @@ class TraceWrappedHandler(underlying: HttpHandler, tracer: Tracer) extends HttpH
           throw e
       finally
         try
-          span.setAttribute(HttpSemconv.httpStatusCode, exchange.getResponseCode)
-          // TODO - sset error appropriately
+          span.setAttribute(HttpSemconv.httpStatusCode, exchange.getStatusCode)
+          // TODO - set error appropriately
           // TODO - check response sizes
         finally span.end()
     }
@@ -66,5 +66,5 @@ object UndertowTextMapGetter extends TextMapGetter[HttpServerExchange]:
     r.getRequestHeaders.getHeaderNames.stream().map(_.toString).collect(java.util.stream.Collectors.toList)
   override def get(r: HttpServerExchange, key: String): String =
     val values = r.getRequestHeaders.get(key)
-    if values.isEmpty then null
+    if values == null || values.isEmpty then null
     else values.getFirst
