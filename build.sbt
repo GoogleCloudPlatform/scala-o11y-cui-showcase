@@ -6,6 +6,8 @@ lazy val utils =
       libraryDependencies ++= Seq(
         Dependencies.otel.api,
         Dependencies.otel.sdkLogs,
+        Dependencies.otel.sdkTesting % "test",
+        Dependencies.assertj.core % "test",
         Dependencies.otel.sdkAutoconf,
         Dependencies.otel.instrumentationLogback,
         Dependencies.slf4j.api,

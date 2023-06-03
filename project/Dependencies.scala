@@ -26,6 +26,7 @@ object Dependencies {
     val api = "io.opentelemetry" % "opentelemetry-api" % otelVersion
     val sdkLogs = "io.opentelemetry" % "opentelemetry-sdk-logs" % s"${otelVersion}-alpha"
     val sdkAutoconf = "io.opentelemetry" % "opentelemetry-sdk-extension-autoconfigure" % s"${otelVersion}-alpha"
+    val sdkTesting = "io.opentelemetry" % "opentelemetry-sdk-testing" % s"${otelVersion}"
     val exporterOtlp = "io.opentelemetry" % "opentelemetry-exporter-otlp" % s"${otelVersion}"
     val exporterOtlpLogs = "io.opentelemetry" % "opentelemetry-exporter-otlp-logs" % s"${otelVersion}-alpha"
     val instrumentationLogback = "io.opentelemetry.instrumentation" % "opentelemetry-logback-appender-1.0" % s"${otelVersion}-alpha"
@@ -42,5 +43,8 @@ object Dependencies {
     val cask = "com.lihaoyi" %% "cask" % "0.9.1"
     val requests = "com.lihaoyi" %% "requests" % "0.8.0"
     val upickle = "com.lihaoyi" %% "upickle" % "3.1.0"
+  }
+  val assertj = new {
+    val core = "org.assertj" % "assertj-core" % "3.24.2"
   }
 }
