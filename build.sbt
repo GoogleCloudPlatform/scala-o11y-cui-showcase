@@ -34,3 +34,6 @@ lazy val root = project
   )
 
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+ThisBuild / crossScalaVersions := Seq((ThisBuild / scalaVersion).value)
+ThisBuild / scalaVersion := Dependencies.scala3Version
+ThisBuild / githubWorkflowPublish := Nil
