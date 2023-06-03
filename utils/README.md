@@ -18,10 +18,11 @@ The `com.google.example.o11y` package provides a few key components:
 
 The `com.google.example.o11y.cask` package provides three main components:
 
-1. An `OtelMainRoutes` class that replaces `cask.MainRoutes` ensuring OpenTelemetry is initialized appropriately and that logs are sent from Cask to slf4j.
-2. A `@traced` annotation that can be added to *any* Cask route to ensure a Span is created when handling that route.
-   This annotation should abide by HTTP semantic conventions in OpenTelemetry as of version 1.21
-4. A `@cui` annotation that can be used to annotate a particular entry point with a CUI.
+1. An `OtelMainRoutes` class that replaces `cask.MainRoutes` ensuring:
+  - OpenTelemetry is initialized appropriately
+  - Logs are sent from Cask to slf4j.
+  - Additionally, this will trace all HttpExchanges handled by Cask. 
+2. A `@cui` annotation that can be used to annotate a particular entry point with a CUI.
 
 Example:
 
@@ -30,7 +31,6 @@ object MyApplication extends OtelMainRoutes:
   initialize()
 
   @cui("my-application-browse")
-  @traced
   @cask.Get("/")
   def index() = "Hello, World!"
 ```

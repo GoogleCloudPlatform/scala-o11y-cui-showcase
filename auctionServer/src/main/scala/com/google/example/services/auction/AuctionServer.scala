@@ -30,7 +30,6 @@ object AuctionServer  extends OtelMainRoutes:
   override def port: Int = 8080
   override def host: String = "0.0.0.0"
 
-  @traced
   @cask.get("/auctions")
   def list() =
     val result = dataStore.list()
@@ -41,27 +40,22 @@ object AuctionServer  extends OtelMainRoutes:
       .build())
     writeJs(result)
 
-  @traced
   @cask.get("/auctions/:id")
   def listOne(id: Long) =
     dataStore.get(id) match
       case None => throw new IllegalArgumentException(s"Auction not found: ${id}")
       case Some(auction) => writeJs(auction)
 
-  @traced
   @cask.postJson("/auctions")
   def add(description: String, minBid: Option[Float] = None) =
     writeJs(dataStore.add(description, minBid.getOrElse(0f)))
 
-  @traced
   @cask.delete("/auctions/:id")
   def delete(id: Long) =
     dataStore.delete(id) match
       case None => throw new IllegalArgumentException(s"Id not found: ${id}")
       case Some(auction) => writeJs(auction)
 
-
-  @traced
   @cask.postJson("/auctions/:id/bid")
   def bid(id: Long, bid: Float) =
     dataStore.bid(id, bid) match

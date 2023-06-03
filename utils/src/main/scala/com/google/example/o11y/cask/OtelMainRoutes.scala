@@ -16,9 +16,20 @@
 
 package com.google.example.o11y.cask
 
+import cask.main.Main
+import io.opentelemetry.api.GlobalOpenTelemetry
+import io.undertow.server.handlers.BlockingHandler
+
 /** Overrides default CASK startup to make sure OTEL is ready. */
 class OtelMainRoutes extends cask.MainRoutes:
   // This call HAS to be done at class-load time (not during main() method), because
   // too many shenanigans happen in CASK and OTEL becomes active prior to main() being called.
   com.google.example.o11y.initializeOpenTelemetry()
   override val log = CaskToSlf4jLogger()
+  private val tracer = GlobalOpenTelemetry.getTracer("cask")
+
+  override def defaultHandler = new BlockingHandler(
+    new TraceWrappedHandler(
+      new Main.DefaultHandler(dispatchTrie, mainDecorators, debugMode, handleNotFound, handleMethodNotAllowed, handleEndpointError)(using log),
+      tracer)
+  )

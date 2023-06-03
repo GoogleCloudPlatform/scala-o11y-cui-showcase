@@ -36,6 +36,7 @@ services:
       - "8081:8081"
     depends_on:
       - collector
+      - auction_server
     environment:
       AUCTION_SERVER: http://auction_server:8080
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
