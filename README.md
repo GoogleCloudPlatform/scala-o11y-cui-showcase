@@ -6,8 +6,8 @@ This project attempts to:
 
 - Demonstrate the value of CUI annotations (See the [talk](https://www.youtube.com/watch?v=qFTVJtlj0xo&ab_channel=ContainerSolutions))
 - Demonstrate how to "instrument" Li Haoyi's ecosystem of Scala 3 libraries
-  - In some cases, there is an elegant solution
-  - In many cases, there is no affordance for our use case, so we duplicate the API.
+  - We try to tackle the raw exchange handler.
+  - This still has issues w/ websockets.
 - Demonstrate (via docker-compose) how to run all these microservices together with ONE observability funnel 
 
 ## What are CUI?

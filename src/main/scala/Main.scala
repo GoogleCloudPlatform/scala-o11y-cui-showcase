@@ -25,7 +25,6 @@ object MyApplication extends OtelMainRoutes:
   override def host: String = "0.0.0.0"
 
   @cui("search")
-  @traced
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
