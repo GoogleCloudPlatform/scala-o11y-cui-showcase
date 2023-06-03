@@ -6,6 +6,8 @@ lazy val utils =
       libraryDependencies ++= Seq(
         Dependencies.otel.api,
         Dependencies.otel.sdkLogs,
+        Dependencies.otel.sdkTesting % "test",
+        Dependencies.assertj.core % "test",
         Dependencies.otel.sdkAutoconf,
         Dependencies.otel.instrumentationLogback,
         Dependencies.slf4j.api,
@@ -30,3 +32,8 @@ lazy val root = project
   .settings(
     name := "scala-o11y-showcase"
   )
+
+ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
+ThisBuild / crossScalaVersions := Seq((ThisBuild / scalaVersion).value)
+ThisBuild / scalaVersion := Dependencies.scala3Version
+ThisBuild / githubWorkflowPublish := Nil

@@ -18,7 +18,8 @@ package com.google.example.o11y
 
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.common.AttributeKey
-import io.opentelemetry.context.{Context,Scope}
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.context.{Context, Scope}
 import io.opentelemetry.sdk.logs.{LogRecordProcessor, ReadWriteLogRecord}
 import io.opentelemetry.sdk.trace.{ReadWriteSpan, ReadableSpan, SpanProcessor}
 
@@ -27,9 +28,14 @@ object CuiKeys:
 
 /** Helper to inject CUI into Baggage. */
 def injectCui(cui: String): Baggage =
+  // First check if we have an active span to inject into.
+  val span = Span.fromContext(Context.current())
+  if span.isRecording then span.setAttribute(CuiKeys.cuiKey, cui)
+  // now insert into baggage.
   Baggage.fromContext(Context.current()).toBuilder
     .put(CuiKeys.cuiKey.getKey, cui)
     .build()
+
 
 /** Helper to inject CUI into the Bagage an immediately make it current context. */
 def injectCuiNow(cui: String): Scope =

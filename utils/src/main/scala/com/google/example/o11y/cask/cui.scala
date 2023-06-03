@@ -16,13 +16,15 @@
 
 package com.google.example.o11y.cask
 
-import com.google.example.o11y.injectCuiNow
-import _root_.cask.{Request, RawDecorator}
+import com.google.example.o11y.{CuiKeys, injectCuiNow}
+import _root_.cask.{RawDecorator, Request}
+import io.opentelemetry.api.trace.Span
+import io.opentelemetry.context.Context
 
 /** Cask wrapper that adds CUI to baggage for remaining processing */
 class cui(val id: String) extends RawDecorator:
   def wrapFunction(ctx: Request, delegate: Delegate) =
-    // Insert this CUI into baggage.
+    // Insert this CUI into baggage and recording span.
     val scope = injectCuiNow(id)
     try delegate(Map())
     finally scope.close()
