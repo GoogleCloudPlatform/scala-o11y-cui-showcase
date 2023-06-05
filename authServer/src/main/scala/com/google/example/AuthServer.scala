@@ -22,7 +22,7 @@ object AuthServer extends OtelMainRoutes:
     authorize(username, password)
 
 
-  def authorize(username: String, password: String) =
+  private def authorize(username: String, password: String) =
     (username, password) match
       case ("admin", "password") =>
         cask.Response(jwt.makeUserToken("admin", Seq("read", "write")))
