@@ -21,7 +21,7 @@ import com.google.example.o11y.requests
 object MyApplication extends OtelMainRoutes:
   initialize()
   private val AuctionServerUrl = sys.env.getOrElse("AUCTION_SERVER", "http://localhost:8080")
-  override def port: Int = 8081
+  override def port: Int = 8080
   override def host: String = "0.0.0.0"
 
   @cui("search")

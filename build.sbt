@@ -12,6 +12,7 @@ lazy val utils =
       Dependencies.lihaoyi.cask,
       Dependencies.lihaoyi.requests,
       Dependencies.lihaoyi.upickle,
+      Dependencies.jwt.upickle,
       Dependencies.otel.sdkTesting % "test",
       Dependencies.assertj.core % "test",
     )

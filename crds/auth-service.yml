@@ -15,10 +15,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-service
+  name: auth-service
 spec:
   selector:
-    app: frontend-service
+    app: auth-service
   ports:
     - port: 80
       targetPort: 8080
@@ -26,21 +26,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-service
+  name: auth-service
 spec:
   selector:
     matchLabels:
-      app: frontend-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: frontend-service
+        app: auth-service
       annotations:
         instrumentation.opentelemetry.io/inject-sdk: "sample.all"
     spec:
       containers:
-        - name: frontend-service
-          image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/scala-o11y-showcase:0.1.0-SNAPSHOT
+        - name: auth-service
+          image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/authserver:0.1.0-SNAPSHOT
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -48,9 +48,7 @@ spec:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: http://gcp-exporter-service-collector:4317
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=frontend_server"
-            - name: AUCTION_SERVER
-              value: http://auction-service.default.svc.cluster.local
+              value: "service.name=auth_server"
           resources:
             requests:
               memory: "512Mi"
