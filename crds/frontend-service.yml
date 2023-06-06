@@ -51,6 +51,8 @@ spec:
               value: "service.name=frontend_server"
             - name: AUCTION_SERVER
               value: http://auction-service.default.svc.cluster.local
+            - name: AUTH_SERVER
+              value: http://auth-service.default.svc.cluster.local
           resources:
             requests:
               memory: "512Mi"

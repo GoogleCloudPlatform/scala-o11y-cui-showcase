@@ -19,12 +19,16 @@ class TestCaskAuth:
       // Check x-access-token header.
       assertEquals("Hello, Josh", requests.get(url,
         headers = Seq("x-access-token"-> jwt.makeUserToken("Josh", Seq("read")))).text())
-      // Check we get unauthorized
-      assertThrows(classOf[RequestFailedException], () => requests.get(url))
-      assertThrows(classOf[RequestFailedException], () => requests.get(url, auth=Bearer(jwt.makeUserToken("bad", Seq()))))
+
+      assertStatusCode(401, () => requests.get(url))
+      assertStatusCode(403, () => requests.get(url, auth=Bearer(jwt.makeUserToken("bad", Seq()))))
+      assertStatusCode(301, () => requests.get(s"$url/redirected", maxRedirects=0))
     }
 
-
+  // Helper to check status code on failed RPCs
+  def assertStatusCode(statusCode: Int, f: org.junit.jupiter.api.function.Executable): Unit =
+    val ex = assertThrows(classOf[RequestFailedException], f)
+    assertEquals(statusCode, ex.response.statusCode)
 
   // Starts a CASK server and returns the URL for it.
   def withServer[T](example: _root_.cask.main.Main)(f: String => T): T =
@@ -43,3 +47,7 @@ object MyTestAuthApp extends _root_.cask.MainRoutes:
   @authorized(Seq("read"))
   @get("/")
   def index()(user: String) = s"Hello, ${user}"
+
+  @authorized(roles = Seq("read"), redirect = Some("/"))
+  @get("/redirected")
+  def redirected()(user: String) = s"Hello, ${user}"

@@ -14,7 +14,7 @@ object AuthServer extends OtelMainRoutes:
   private val jwt = auth.Jwt.default
 
   @cask.postJson("/login_json")
-  def loginJson(username: String, password: String) =
+  def loginJson(username: String, password: String) = 
     authorize(username, password)
 
   @cask.postForm("/login_form")

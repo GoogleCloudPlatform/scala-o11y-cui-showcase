@@ -49,5 +49,6 @@ services:
       - auth_server
     environment:
       AUCTION_SERVER: http://auction_server:8080
+      AUTH_SERVER: http://auth_server:8080
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
       OTEL_RESOURCE_ATTRIBUTES: "service.name=gateway"
