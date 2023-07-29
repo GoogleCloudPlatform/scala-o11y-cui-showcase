@@ -29,12 +29,18 @@ lazy val authServer =
     .enablePlugins(DockerConventions)
     .dependsOn(utils)
 
+lazy val simulation =
+  project
+    .in(file("simulation"))
+    .enablePlugins(DockerConventions)
+    .dependsOn(utils)
+
 lazy val root = project
   .name("scala-o11y-showcase")
   .in(file("."))
   .enablePlugins(DockerConventions)
   .dependsOn(utils)
-  .aggregate(utils, auctionServer, authServer)
+  .aggregate(utils, auctionServer, authServer, simulation)
 
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 ThisBuild / crossScalaVersions := Seq((ThisBuild / scalaVersion).value)

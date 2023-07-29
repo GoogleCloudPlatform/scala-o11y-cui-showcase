@@ -25,3 +25,17 @@ spec:
   sampler:
     type: parentbased_traceidratio
     argument: "1.0"
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: sample.tenth
+spec:
+  exporter:
+    endpoint: http://gcp-exporter-service-collector.opentelemetry-operator-system.svc.cluster.local:4317
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.1"

@@ -14,11 +14,17 @@ class TestCaskAuth:
   def testAuthorizedEndpoint(): Unit =
     withServer(MyTestAuthApp) { url =>
       // Check Authorization/Bearer header.
+      // TODO - make sure this is works when not using localhost.
+      // It seems the `Bearer` string may change.
       assertEquals("Hello, World", requests.get(url,
         auth=Bearer(jwt.makeUserToken("World", Seq("read")))).text())
       // Check x-access-token header.
       assertEquals("Hello, Josh", requests.get(url,
         headers = Seq("x-access-token"-> jwt.makeUserToken("Josh", Seq("read")))).text())
+      // Check cookie.
+      assertEquals("Hello, Cookie Monster", requests.get(url,
+        cookieValues = Map("jwt" -> jwt.makeUserToken("Cookie Monster", Seq("read")))
+      ).text())
 
       assertStatusCode(401, () => requests.get(url))
       assertStatusCode(403, () => requests.get(url, auth=Bearer(jwt.makeUserToken("bad", Seq()))))

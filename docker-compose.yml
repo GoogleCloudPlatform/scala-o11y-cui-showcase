@@ -52,3 +52,9 @@ services:
       AUTH_SERVER: http://auth_server:8080
       OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
       OTEL_RESOURCE_ATTRIBUTES: "service.name=gateway"
+  simulation:
+    image: simulation:0.1.0-SNAPSHOT
+    depends_on:
+      - gateway
+    environment:
+      FRONTEND_SERVER: http://gateway:8080

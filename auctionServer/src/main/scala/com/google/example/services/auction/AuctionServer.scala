@@ -25,7 +25,11 @@ object AuctionServer  extends OtelMainRoutes:
   initialize()
   // TODO - Move this to a database.
   private val dataStore: AuctionDataStore = new LocalAuctionDataStore()
-  private val eventLogger = io.opentelemetry.api.events.GlobalEventEmitterProvider.get().get("AuctionServer")
+  private val eventLogger = 
+    io.opentelemetry.api.events.GlobalEventEmitterProvider.get()
+      .get("AuctionServer")
+    
+  private val logger = org.slf4j.LoggerFactory.getLogger("JOSH")
 
   override def port: Int = 8080
   override def host: String = "0.0.0.0"

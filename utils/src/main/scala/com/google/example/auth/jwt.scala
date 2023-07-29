@@ -1,5 +1,9 @@
 package com.google.example.auth
 
+
+import _root_.cask.model.Cookie
+import io.opentelemetry.context.{Context, ContextKey}
+
 import java.time.Instant
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtOptions, JwtUpickle}
 
@@ -10,6 +14,13 @@ object Jwt:
     sys.env.get("JWT_PRIVATE_KEY") match
       case Some(key) => Jwt(key)
       case None => Jwt("Security is inconvenient")
+
+  private val otelKey: ContextKey[String] =
+    ContextKey.named("jwt_token")
+  def tokenFromContext(ctx: Context): Option[String] =
+    Option(ctx.get(otelKey))
+  def storeTokenInContext(ctx: Context, token: String): Context =
+    ctx.`with`(otelKey, token)
 
 // TODO - we're going to be  lazy and put roles right on the token.
 class Jwt(privateKey: String):
@@ -39,6 +50,21 @@ class Jwt(privateKey: String):
 
   def makeUserToken(name: String, roles: Seq[String]): String =
     makeToken(claim => claim.about(name) + ("roles", roles))
+
+  // Canonical way to make cookies that works w/ our Cask/Requests integration.
+  def makeCookieValue(token: String): Map[String, String] =
+    Map("jwt" -> token)
+
+  def makeCookie(token: String): Cookie =
+    // TODO - set some safety aspects to the cookie.
+    val claim = decode(token).get
+    Cookie(
+      name = "jwt",
+      value = token,
+      expires = claim.expiration.map(Instant.ofEpochSecond).orNull,
+      secure = true,
+      sameSite = "Strict"
+    )
 
   def ensureUserHasRoles(token: String, roles: Seq[String]): Try[String] =
     def obj(value: ujson.Value): Try[ujson.Obj] = Try(value.asInstanceOf[ujson.Obj])

@@ -11,48 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-spec:
-  selector:
-    app: frontend-service
-  ports:
-    - port: 80
-      targetPort: 8080
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-service
+  name: simulation
 spec:
   selector:
     matchLabels:
-      app: frontend-service
+      app: simulation
   template:
     metadata:
       labels:
-        app: frontend-service
-      annotations:
-        instrumentation.opentelemetry.io/inject-sdk: "sample.tenth"
+        app: simulation
     spec:
       containers:
-        - name: frontend-service
-          image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/scala-o11y-showcase:0.1.0-SNAPSHOT
+        - name: simulation
+          image: %GCP_REGION%-docker.pkg.dev/%GCP_PROJECT%/%GCP_REPO_NAME%/simulation:0.1.0-SNAPSHOT
           imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
+#          ports:
+#            - containerPort: 8080
           env:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://gcp-exporter-service-collector:4317
-            - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "service.name=frontend_server"
-            - name: AUCTION_SERVER
-              value: http://auction-service.default.svc.cluster.local
-            - name: AUTH_SERVER
-              value: http://auth-service.default.svc.cluster.local
+            - name: FRONTEND_SERVER
+              value: http://frontend-service.default.svc.cluster.local
           resources:
             requests:
               memory: "512Mi"
