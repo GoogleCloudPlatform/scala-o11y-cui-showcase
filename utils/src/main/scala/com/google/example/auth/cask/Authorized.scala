@@ -28,6 +28,8 @@ class authorized(val roles: Seq[String] = Nil, val redirect: Option[String] = No
           }.get
         catch
           case ex: Exception =>
+            System.err.println(s"Failed to verify user for roles: $roles")
+            ex.printStackTrace()
             redirectResult getOrElse Result.Success(Abort(403))
       case _ =>
         redirectResult getOrElse Result.Success(Abort(401))
