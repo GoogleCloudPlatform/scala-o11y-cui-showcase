@@ -19,14 +19,21 @@ package com.google.example.o11y
 import java.net.HttpCookie
 import javax.net.ssl.SSLContext
 import scala.collection.mutable
-import _root_.requests.{BaseSession,RequestAuth,Cert,Compress}
+import _root_.requests.{BaseSession, Cert, Compress, RequestAuth}
+import com.google.example.auth.Jwt
+import io.opentelemetry.context.Context
 
 // Our version of the li haoyi's requests library w/ baked in OpenTelemetry support.
 // TODO - Client spans?
 package object requests extends BaseSession:
   def cookies = mutable.Map.empty[String, HttpCookie]
+  // Pull headers from context for o11y, if they exist.
   override def headers = BaseSession.defaultHeaders ++ propagatedHeaders()
-  def auth = RequestAuth.Empty
+  // pull auth from context if it exists.
+  override def auth =
+    Jwt.tokenFromContext(Context.current) match
+      case Some(token) => RequestAuth.Bearer(token)
+      case None => RequestAuth.Empty
   def proxy = null
   def cert: Cert = null
   def sslContext: SSLContext = null

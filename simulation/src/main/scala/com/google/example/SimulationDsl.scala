@@ -5,6 +5,7 @@ trait SimulationDsl:
   def login(): String
   def listAuctions(authToken: String): String
 
+  def postAuction(authToken: String, description: String): String
 
 object SimulationDsl:
   def apply(): SimulationDsl =
@@ -23,4 +24,11 @@ object SimulationDsl:
               auth = requests.RequestAuth.Bearer(authToken)
             ).text()
         result
+
+      override def postAuction(authToken: String, description: String): String =
+        requests.post(
+          s"${frontend}/auctions",
+          data = ujson.Obj("description" -> description),
+          auth = requests.RequestAuth.Bearer(authToken)
+        ).text()
 

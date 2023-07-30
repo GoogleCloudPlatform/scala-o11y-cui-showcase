@@ -16,7 +16,8 @@
 
 package com.google.example.services.auction
 
-import com.google.example.o11y.cask._
+import com.google.example.auth.cask.authorized
+import com.google.example.o11y.cask.*
 import upickle.default.writeJs
 import io.opentelemetry.api.common.Attributes
 
@@ -34,6 +35,7 @@ object AuctionServer  extends OtelMainRoutes:
   override def port: Int = 8080
   override def host: String = "0.0.0.0"
 
+  @authorized(roles=Seq("read"))
   @cask.get("/auctions")
   def list() =
     val result = dataStore.list()
@@ -50,9 +52,10 @@ object AuctionServer  extends OtelMainRoutes:
       case None => throw new IllegalArgumentException(s"Auction not found: ${id}")
       case Some(auction) => writeJs(auction)
 
+  @authorized(roles=Seq("write"))
   @cask.postJson("/auctions")
-  def add(description: String, minBid: Option[Float] = None) =
-    writeJs(dataStore.add(description, minBid.getOrElse(0f)))
+  def add(description: String, minBid: Option[Float] = None)(user: String) =
+    writeJs(dataStore.add(user, description, minBid.getOrElse(0f)))
 
   @cask.delete("/auctions/:id")
   def delete(id: Long) =

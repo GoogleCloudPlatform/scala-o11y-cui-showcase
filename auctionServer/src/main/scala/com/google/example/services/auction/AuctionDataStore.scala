@@ -19,7 +19,7 @@ package com.google.example.services.auction
 /** Abstraction we use to stub-out different datastores/backends. */
 trait AuctionDataStore:
   /** Stores an auction. */
-  def add(description: String, minBid: Float): Auction
+  def add(user: String, description: String, minBid: Float): Auction
   /** Deletes an auction, returning its value. */
   def delete(id: Long): Option[Auction]
   /** Returns all live auctions. */
@@ -37,9 +37,9 @@ class LocalAuctionDataStore extends AuctionDataStore:
   private var auctions = List[Auction](Auction(5000, "seed item", "Josh", 0, Seq()))
 
 
-  override def add(description: String, minBid: Float): Auction =
+  override def add(user: String, description: String, minBid: Float): Auction =
     synchronized {
-      val auction = Auction(nextId, description, "{unknown}", minBid, List())
+      val auction = Auction(nextId, description, user, minBid, List())
       nextId += 1
       auctions = auction :: auctions
       auction

@@ -27,7 +27,7 @@ object MyApplication extends OtelMainRoutes:
   override def host: String = "0.0.0.0"
 
   @cui("search")
-  @authorized(roles=Seq("read"), redirect = Some("/login"))
+  @authorized(redirect = Some("/login"))
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
@@ -38,10 +38,17 @@ object MyApplication extends OtelMainRoutes:
     // TODO - create HTML form login
     "Please Login!"
 
+  @cui("login")
   @cask.postJson("/login")
   def login(username: String, password: String) =
     // TODO - Do something with the response so our token is saved for the whole session.
     requests.post(s"${AuthServerUrl}/login_form", data=Map("username"->username, "password"->password)).text()
 
 
-
+  @cui("post_auction")
+  @authorized()
+  @cask.postJson("/auctions")
+  def postAuction(description: String, minBid: Option[Float] = None) =
+    requests.post(s"${AuctionServerUrl}/auctions",
+      data = ujson.Obj("description" -> description, "minBid" -> minBid)
+    ).text()
