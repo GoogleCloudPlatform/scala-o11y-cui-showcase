@@ -28,4 +28,7 @@ object AuthServer extends OtelMainRoutes:
         cask.Response(jwt.makeUserToken("admin", Seq("read", "write")))
       case ("user", "pw") =>
         cask.Response(jwt.makeUserToken("user", Seq("read")))
+      case (user, "password") =>
+        // Synthesize user names
+        cask.Response(jwt.makeUserToken(user, Seq("read", "write")))
       case _ => cask.Abort(401)

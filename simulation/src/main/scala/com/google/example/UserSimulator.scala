@@ -7,9 +7,13 @@ import java.util.concurrent.Executor
 class UserSimulator(dsl: SimulationDsl, pool: Executor) extends Runnable:
   val rng = java.util.Random()
   val userAuthCache = collection.mutable.HashMap[Int, String]()
+
+  // TODO - fun names for users.
+  def username(id: Int) = s"user${id}"
   def signInAuctionViewer(id: Int): Runnable = () =>
     System.out.println(s"User $id attempting to view auctions")
-    val auth = userAuthCache.getOrElseUpdate(id, dsl.login())
+
+    val auth = userAuthCache.getOrElseUpdate(id, dsl.login(username(id)))
     // Try unauthenticated, get bounced, auth, then list auctions.
     dsl.listAuctions(auth) match
       case "Please Login!" =>
@@ -22,7 +26,7 @@ class UserSimulator(dsl: SimulationDsl, pool: Executor) extends Runnable:
 
   def postAuction(id: Int): Runnable = () =>
     System.out.println(s"User $id attempting to post an auction")
-    val auth = userAuthCache.getOrElseUpdate(id, dsl.login())
+    val auth = userAuthCache.getOrElseUpdate(id, dsl.login(username(id)))
     // TODO - Save the posted auction and delete it after some time.
     dsl.postAuction(auth, s"User $id's item")
 
