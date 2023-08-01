@@ -19,4 +19,4 @@ package com.google.example.services.messages
 import upickle.default.*
 
 case class Auction(id: Long, description: String, owner: String, minBid: Float, bids: Seq[Bid]) derives ReadWriter
-case class Bid(id: Long, onwer: String, amount: Float) derives ReadWriter
+case class Bid(id: Long, owner: String, amount: Float) derives ReadWriter

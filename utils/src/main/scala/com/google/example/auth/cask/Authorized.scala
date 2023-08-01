@@ -24,7 +24,7 @@ class authorized(val roles: Seq[String] = Nil, val redirect: Option[String] = No
           // If we get a valid token, we'll put it into Context.
           scala.util.Using.Manager { use =>
             use(Jwt.storeTokenInContext(Context.current(), token).makeCurrent())
-            delegate(Map("user" -> user))
+            delegate(Map("user" -> user, "claim" -> jwt.decode(token).get, "token" -> token))
           }.get
         catch
           case ex: Exception =>

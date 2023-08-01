@@ -1,7 +1,9 @@
 package com.google.example
 
 import com.google.example.AuthServer.jwt
+import com.google.example.auth.cask.authorized
 import com.google.example.o11y.cask.OtelMainRoutes
+import pdi.jwt.JwtClaim
 
 /**
  * This server is responsible for understanding user names and passwords and returning
@@ -21,11 +23,18 @@ object AuthServer extends OtelMainRoutes:
   def loginForm(username: String, password: String) =
     authorize(username, password)
 
+  // Sends a JWT token and verifies it's still valid and originated from this auth server.
+  @authorized // First step of validation of the token.
+  @cask.get("/check")
+  def check() =
+    // TODO - other checks, or "deactivation" of tokens.
+    "Ok"
+
 
   private def authorize(username: String, password: String) =
     (username, password) match
       case ("admin", "password") =>
-        cask.Response(jwt.makeUserToken("admin", Seq("read", "write")))
+        cask.Response(jwt.makeUserToken("admin", Seq("read", "write", "superuser")))
       case ("user", "pw") =>
         cask.Response(jwt.makeUserToken("user", Seq("read")))
       case (user, "password") =>

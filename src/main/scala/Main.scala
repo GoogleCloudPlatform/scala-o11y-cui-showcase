@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import com.google.example.o11y.cask.{cui, OtelMainRoutes}
+import cask.Request
+import cask.model.Response.Raw
+import cask.router.{RawDecorator, Result}
+import com.google.example.o11y.cask.{OtelMainRoutes, cui}
 import com.google.example.o11y.requests
 import com.google.example.auth.cask.authorized
 
@@ -28,6 +31,7 @@ object MyApplication extends OtelMainRoutes:
 
   @cui("search")
   @authorized(redirect = Some("/login"))
+  @verifyToken()
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
@@ -47,6 +51,7 @@ object MyApplication extends OtelMainRoutes:
 
   @cui("post_auction")
   @authorized()
+  @verifyToken()
   @cask.postJson("/auctions")
   def postAuction(description: String, minBid: Option[Float] = None) =
     ujson.read(
@@ -56,6 +61,7 @@ object MyApplication extends OtelMainRoutes:
 
   @cui("bid_auction")
   @authorized()
+  @verifyToken()
   @cask.postJson("/auctions/:id/bid")
   def bid(id: Long, bid: Float) =
     ujson.read(
@@ -65,6 +71,15 @@ object MyApplication extends OtelMainRoutes:
 
   @cui("delete_auction")
   @authorized()
+  @verifyToken()
   @cask.delete("/auctions/:id")
   def delete(id: Long) =
     requests.delete(s"${AuctionServerUrl}/auctions/${id}").text()
+
+
+  // Verifies user's auth token with the Auth Server.  Any non-OK response is treated as a broken token.
+  class verifyToken extends RawDecorator:
+    override def wrapFunction(ctx: Request, delegate: Delegate): Result[Raw] =
+      requests.get(s"${AuthServerUrl}/check").text() match
+        case "Ok" => delegate(Map())
+        case _ => Result.Success(cask.Abort(401))
