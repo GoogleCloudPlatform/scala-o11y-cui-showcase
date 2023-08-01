@@ -16,6 +16,8 @@
 
 package com.google.example.services.auction
 
+import com.google.example.services.messages.{Auction, Bid}
+
 /** Abstraction we use to stub-out different datastores/backends. */
 trait AuctionDataStore:
   /** Stores an auction. */
@@ -27,7 +29,7 @@ trait AuctionDataStore:
   /** Returns all live auctions. */
   def list(): Seq[Auction]
   /** Creates a new bid on a specific auction. */
-  def bid(id: Long, bid: Float): Option[Auction]
+  def bid(id: Long, user: String, bid: Float): Option[Auction]
 
 
 /** Lame, synchronous in-memory implementation. */
@@ -54,10 +56,10 @@ class LocalAuctionDataStore extends AuctionDataStore:
         Some(auction)
   override def list(): Seq[Auction] = auctions
   override def get(id: Long): Option[Auction] = auctions.find(_.id == id)
-  override def bid(id: Long, bid: Float): Option[Auction] =
+  override def bid(id: Long, user: String, bid: Float): Option[Auction] =
     synchronized {
       auctions.find(_.id == id).map { auction =>
-        val b = Bid(auction.bids.length + 1, "{unknown}", bid)
+        val b = Bid(auction.bids.length + 1, user, bid)
         val updated = auction.copy(bids = auction.bids :+ b)
         auctions = updated :: auctions.filter(_ != auction)
         updated

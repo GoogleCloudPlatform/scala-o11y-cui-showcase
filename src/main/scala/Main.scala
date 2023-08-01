@@ -31,7 +31,7 @@ object MyApplication extends OtelMainRoutes:
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
-    requests.get(s"${AuctionServerUrl}/auctions").data.array
+    ujson.read(requests.get(s"${AuctionServerUrl}/auctions").text())
 
   @cask.get("/login")
   def login() =
@@ -49,6 +49,22 @@ object MyApplication extends OtelMainRoutes:
   @authorized()
   @cask.postJson("/auctions")
   def postAuction(description: String, minBid: Option[Float] = None) =
-    requests.post(s"${AuctionServerUrl}/auctions",
-      data = ujson.Obj("description" -> description, "minBid" -> minBid)
-    ).text()
+    ujson.read(
+      requests.post(s"${AuctionServerUrl}/auctions",
+        data = ujson.Obj("description" -> description, "minBid" -> minBid)
+      ).text())
+
+  @cui("bid_auction")
+  @authorized()
+  @cask.postJson("/auctions/:id/bid")
+  def bid(id: Long, bid: Float) =
+    ujson.read(
+      requests.post(s"${AuctionServerUrl}/auctions/${id}/bid",
+        data = ujson.Obj("bid" -> bid)
+      ).text())
+
+  @cui("delete_auction")
+  @authorized()
+  @cask.delete("/auctions/:id")
+  def delete(id: Long) =
+    requests.delete(s"${AuctionServerUrl}/auctions/${id}").text()

@@ -57,14 +57,17 @@ object AuctionServer  extends OtelMainRoutes:
   def add(description: String, minBid: Option[Float] = None)(user: String) =
     writeJs(dataStore.add(user, description, minBid.getOrElse(0f)))
 
+  @authorized(roles=Seq("write"))
   @cask.delete("/auctions/:id")
   def delete(id: Long) =
+    // TODO - Check that only owner of auction can delete, or that user has superprivilege?
     dataStore.delete(id) match
       case None => throw new IllegalArgumentException(s"Id not found: ${id}")
       case Some(auction) => writeJs(auction)
 
+  @authorized(roles=Seq("write"))
   @cask.postJson("/auctions/:id/bid")
-  def bid(id: Long, bid: Float) =
-    dataStore.bid(id, bid) match
+  def bid(id: Long, bid: Float)(user: String) =
+    dataStore.bid(id, user, bid) match
       case None => throw new IllegalArgumentException(s"Auction not found: ${id}")
       case Some(auction) => writeJs(auction)

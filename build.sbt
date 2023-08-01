@@ -17,11 +17,16 @@ lazy val utils =
       Dependencies.assertj.core % "test",
     )
 
+lazy val messages =
+  project.in(file("messages"))
+  .enablePlugins(ScalaConventions)
+  .dependsOnExternal(Dependencies.lihaoyi.upickle)
+
 lazy val auctionServer =
   project
     .in(file("auctionServer"))
     .enablePlugins(DockerConventions)
-    .dependsOn(utils)
+    .dependsOn(utils, messages)
 
 lazy val authServer =
   project
@@ -33,14 +38,14 @@ lazy val simulation =
   project
     .in(file("simulation"))
     .enablePlugins(DockerConventions)
-    .dependsOn(utils)
+    .dependsOn(utils, messages)
 
 lazy val root = project
   .name("scala-o11y-showcase")
   .in(file("."))
   .enablePlugins(DockerConventions)
-  .dependsOn(utils)
-  .aggregate(utils, auctionServer, authServer, simulation)
+  .dependsOn(utils, messages)
+  .aggregate(utils, auctionServer, authServer, simulation, messages)
 
 ThisBuild / githubWorkflowJavaVersions += JavaSpec.temurin("17")
 ThisBuild / crossScalaVersions := Seq((ThisBuild / scalaVersion).value)
