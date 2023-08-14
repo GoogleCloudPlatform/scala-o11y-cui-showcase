@@ -26,8 +26,12 @@ object MyApplication extends OtelMainRoutes:
   initialize()
   private val AuctionServerUrl = sys.env.getOrElse("AUCTION_SERVER", "http://localhost:8080")
   private val AuthServerUrl = sys.env.getOrElse("AUTH_SERVER", "http://localhost:8082")
+  private val eventLogger =
+    io.opentelemetry.api.events.GlobalEventEmitterProvider.get()
+      .get("FrontendServer")
   override def port: Int = 8080
   override def host: String = "0.0.0.0"
+
 
   @cui("search")
   @authorized(redirect = Some("/login"))
@@ -35,7 +39,8 @@ object MyApplication extends OtelMainRoutes:
   @cask.get("/")
   def index() =
     log.debug("Serving index.")
-    ujson.read(requests.get(s"${AuctionServerUrl}/auctions").text())
+    val text = requests.get(s"${AuctionServerUrl}/auctions").text()
+    time("readJson")(ujson.read(text))
 
   @cask.get("/login")
   def login() =
@@ -46,7 +51,9 @@ object MyApplication extends OtelMainRoutes:
   @cask.postJson("/login")
   def login(username: String, password: String) =
     // TODO - Do something with the response so our token is saved for the whole session.
-    requests.post(s"${AuthServerUrl}/login_form", data=Map("username"->username, "password"->password)).text()
+    val text =
+      requests.post(s"${AuthServerUrl}/login_form", data=Map("username"->username, "password"->password)).text()
+    text
 
 
   @cui("post_auction")
@@ -54,20 +61,20 @@ object MyApplication extends OtelMainRoutes:
   @verifyToken()
   @cask.postJson("/auctions")
   def postAuction(description: String, minBid: Option[Float] = None) =
-    ujson.read(
-      requests.post(s"${AuctionServerUrl}/auctions",
-        data = ujson.Obj("description" -> description, "minBid" -> minBid)
-      ).text())
+    val text = requests.post(s"${AuctionServerUrl}/auctions",
+      data = ujson.Obj("description" -> description, "minBid" -> minBid)
+    ).text()
+    time("readJson")(ujson.read(text))
 
   @cui("bid_auction")
   @authorized()
   @verifyToken()
   @cask.postJson("/auctions/:id/bid")
   def bid(id: Long, bid: Float) =
-    ujson.read(
-      requests.post(s"${AuctionServerUrl}/auctions/${id}/bid",
-        data = ujson.Obj("bid" -> bid)
-      ).text())
+    val text = requests.post(s"${AuctionServerUrl}/auctions/${id}/bid",
+      data = ujson.Obj("bid" -> bid)
+    ).text()
+    time("readJson")(ujson.read(text))
 
   @cui("delete_auction")
   @authorized()

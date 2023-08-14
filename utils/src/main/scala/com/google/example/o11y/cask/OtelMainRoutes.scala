@@ -20,6 +20,8 @@ import cask.main.Main
 import io.opentelemetry.api.GlobalOpenTelemetry
 import io.undertow.server.handlers.BlockingHandler
 
+import scala.util.Using
+
 /** Overrides default CASK startup to make sure OTEL is ready. */
 class OtelMainRoutes extends cask.MainRoutes:
   // This call HAS to be done at class-load time (not during main() method), because
@@ -33,3 +35,10 @@ class OtelMainRoutes extends cask.MainRoutes:
       new Main.DefaultHandler(dispatchTrie, mainDecorators, debugMode, handleNotFound, handleMethodNotAllowed, handleEndpointError)(using log),
       tracer)
   )
+
+  
+  
+  inline def time[A](name: String)(inline f: => A): A =
+    val span = tracer.spanBuilder(name).startSpan()
+    try Using(span.makeCurrent())(_ => f).get
+    finally span.end()
