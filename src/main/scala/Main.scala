@@ -24,6 +24,7 @@ import com.google.example.auth.cask.authorized
 // This is our "outer gateway" to the microservices.
 object MyApplication extends OtelMainRoutes:
   initialize()
+  private val rng = java.util.Random()
   private val AuctionServerUrl = sys.env.getOrElse("AUCTION_SERVER", "http://localhost:8080")
   private val AuthServerUrl = sys.env.getOrElse("AUTH_SERVER", "http://localhost:8082")
   private val eventLogger =
@@ -40,7 +41,12 @@ object MyApplication extends OtelMainRoutes:
   def index() =
     log.debug("Serving index.")
     val text = requests.get(s"${AuctionServerUrl}/auctions").text()
-    time("readJson")(ujson.read(text))
+    if rng.nextBoolean()
+    then time("readJson2")(ujson.read(text))
+    else time("readJson1") {
+      Thread.sleep(2000L)
+      ujson.read(text)
+    }
 
   @cask.get("/login")
   def login() =
@@ -74,6 +80,7 @@ object MyApplication extends OtelMainRoutes:
     val text = requests.post(s"${AuctionServerUrl}/auctions/${id}/bid",
       data = ujson.Obj("bid" -> bid)
     ).text()
+    // Experiment w/ new read json API.
     time("readJson")(ujson.read(text))
 
   @cui("delete_auction")

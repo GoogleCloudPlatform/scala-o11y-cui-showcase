@@ -51,7 +51,7 @@ spec:
         log_statements:
           - context: log
             statements:
-            - set(attributes["gcp.log_name"], instrumentation_scope.name) where attributes["gcp.log_name"] == nil
+            - set(attributes["gcp.log_name"], resource.attributes["service.name"]) where attributes["gcp.log_name"] == nil
     service:
       pipelines:
         traces:
