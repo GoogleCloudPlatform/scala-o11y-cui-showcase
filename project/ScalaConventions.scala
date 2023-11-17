@@ -28,6 +28,9 @@ object ScalaConventions extends AutoPlugin {
     organizationName := "Google",
     startYear := Some(2023),
     licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt")),
-    libraryDependencies += "net.aichler" % "jupiter-interface" % JupiterKeys.jupiterVersion.value % Test
+    libraryDependencies += "net.aichler" % "jupiter-interface" % JupiterKeys.jupiterVersion.value % Test,
+    // Scaladoc has infinite loop we keep running into https://github.com/lampepfl/dotty/issues/18311
+    Compile / packageDoc / publishArtifact := false,
+    Compile / doc / sources := Seq.empty
   )
 }

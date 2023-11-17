@@ -95,7 +95,7 @@ export GCP_REGION=us-east1
 
 Push docker images to artifact registry
 ```bash
-sbt Docker/publishLocal && ./push_docker_images.sh
+./push_docker_images.sh
 ```
 
 ## Pushing CRDs

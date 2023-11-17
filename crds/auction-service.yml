@@ -36,7 +36,7 @@ spec:
       labels:
         app: auction-service
       annotations:
-        instrumentation.opentelemetry.io/inject-sdk: "sample.all"
+        instrumentation.opentelemetry.io/inject-sdk: "sample.tenth"
     spec:
       containers:
         - name: auction-service

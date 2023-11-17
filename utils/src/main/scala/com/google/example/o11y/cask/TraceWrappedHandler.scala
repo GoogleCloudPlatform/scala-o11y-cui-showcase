@@ -56,7 +56,7 @@ class TraceWrappedHandler(underlying: HttpHandler, tracer: Tracer) extends HttpH
           // TODO - check response sizes
         finally span.end()
     }
-
+  
   private def spanName(exchange: HttpServerExchange): String =
     s"${exchange.getRequestMethod.toString} ${exchange.getRequestURI}"
 
