@@ -42,7 +42,7 @@ object Dependencies {
   val lihaoyi = new {
     val cask = "com.lihaoyi" %% "cask" % "0.9.1"
     val requests = "com.lihaoyi" %% "requests" % "0.8.0"
-    val upickle = "com.lihaoyi" %% "upickle" % "3.1.0"
+    val upickle = "com.lihaoyi" %% "upickle" % "3.3.1"
   }
   val assertj = new {
     val core = "org.assertj" % "assertj-core" % "3.24.2"
