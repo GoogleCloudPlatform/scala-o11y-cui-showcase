@@ -48,6 +48,6 @@ object Dependencies {
     val core = "org.assertj" % "assertj-core" % "3.24.2"
   }
   val jwt = new {
-    val upickle = "com.github.jwt-scala" %% "jwt-upickle" % "9.3.0"
+    val upickle = "com.github.jwt-scala" %% "jwt-upickle" % "9.4.6"
   }
 }
