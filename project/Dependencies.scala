@@ -40,7 +40,7 @@ object Dependencies {
     val classic = "ch.qos.logback" % "logback-classic" % logbackVersion
   }
   val lihaoyi = new {
-    val cask = "com.lihaoyi" %% "cask" % "0.9.1"
+    val cask = "com.lihaoyi" %% "cask" % "0.10.2"
     val requests = "com.lihaoyi" %% "requests" % "0.8.0"
     val upickle = "com.lihaoyi" %% "upickle" % "3.1.0"
   }
