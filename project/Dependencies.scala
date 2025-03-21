@@ -20,7 +20,7 @@ import sbt._
 object Dependencies {
   val scala3Version = "3.3.0"
   val otelVersion = "1.48.0"
-  val slf4jVersion = "2.0.6"
+  val slf4jVersion = "2.0.17"
   val logbackVersion = "1.4.6"
   val otel = new {
     val api = "io.opentelemetry" % "opentelemetry-api" % otelVersion
